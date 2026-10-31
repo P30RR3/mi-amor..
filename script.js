@@ -25,8 +25,10 @@ const choiceAudio = document.getElementById("choice-audio");
 const choiceAudioStatus = document.getElementById("choice-audio-status");
 const finalAudio = document.getElementById("final-audio");
 const finalAudioStatus = document.getElementById("final-audio-status");
+const responseStatus = document.getElementById("response-status");
 const chalkboardCanvas = document.getElementById("chalkboard-canvas");
 const chalkboardContext = chalkboardCanvas.getContext("2d");
+const responseNotificationEndpoint = "https://script.google.com/macros/s/AKfycbzc_fQ-zgXXb8Fr_K5fgnoc2bGo4x78HTupvFbKMqRlc84HvdSQ1pVGov4SwBcNCfiL/exec";
 const musicTracks = [
   { audio: startAudio, status: startAudioStatus },
   { audio: choiceAudio, status: choiceAudioStatus },
@@ -743,6 +745,7 @@ choiceAudio.addEventListener("error", () => reportAudioError(choiceAudioStatus))
 finalAudio.addEventListener("error", () => reportAudioError(finalAudioStatus));
 
 document.getElementById("yes-button").addEventListener("click", () => {
+  notifyResponse("si");
   document.getElementById("proposal-question").hidden = true;
   document.getElementById("proposal-yes-intro").hidden = false;
   for (let index = 0; index < 22; index += 1) {
@@ -762,6 +765,7 @@ document.getElementById("show-surprise").addEventListener("click", () => {
   document.getElementById("proposal-surprise").hidden = false;
 });
 document.getElementById("no-button").addEventListener("click", () => {
+  notifyResponse("no");
   document.getElementById("proposal-question").hidden = true;
   document.getElementById("proposal-no-result").hidden = false;
 });
@@ -868,6 +872,26 @@ window.addEventListener("resize", resizeChalkboard);
 window.addEventListener("keydown", handleKeyDown);
 window.addEventListener("keyup", handleKeyUp);
 window.addEventListener("blur", () => keys.clear());
+
+function notifyResponse(answer) {
+  if (!responseNotificationEndpoint) {
+    responseStatus.textContent = "La notificación aún no está configurada.";
+    return;
+  }
+
+  responseStatus.textContent = "Enviando tu respuesta...";
+  fetch(responseNotificationEndpoint, {
+    method: "POST",
+    mode: "no-cors",
+    body: new URLSearchParams({ answer }),
+    keepalive: true
+  }).then(() => {
+    responseStatus.textContent = "Solicitud enviada al servicio. Revisa tu correo para confirmar.";
+  }).catch((error) => {
+    responseStatus.textContent = "No se pudo enviar la respuesta. Inténtalo de nuevo.";
+    console.error("No se pudo notificar la respuesta:", error);
+  });
+}
 
 function gameLoop(timestamp) {
   const deltaSeconds = lastFrame ? Math.min((timestamp - lastFrame) / 1000, .05) : 0;

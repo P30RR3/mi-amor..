@@ -9,6 +9,7 @@ const footerPhase = document.getElementById("footer-phase");
 const previousButton = document.getElementById("previous-phase");
 const nextButton = document.getElementById("next-phase");
 const phaseLoader = document.getElementById("phase-loader");
+const phaseLoaderMessage = document.getElementById("phase-loader-message");
 const canvas = document.getElementById("game-canvas");
 const context = canvas.getContext("2d");
 const starCount = document.getElementById("star-count");
@@ -52,7 +53,6 @@ let isDrawing = false;
 let chalkColorIndex = 0;
 
 function showPhase(number) {
-  const previousPhase = currentPhase;
   const requestedPhase = Math.max(1, Math.min(phases.length, number));
   currentPhase = gameComplete ? requestedPhase : Math.min(requestedPhase, 3);
   if (currentPhase !== 3) resetJoystick();
@@ -85,15 +85,12 @@ function showPhase(number) {
     canvas.focus({ preventScroll: true });
   }
 
-  if (currentPhase === 2 || currentPhase === 3) {
+  if (currentPhase <= 4) {
     choiceAudio.pause();
     finalAudio.pause();
-  } else if (currentPhase === 4 || currentPhase === 5 || currentPhase === 6) {
-    startAudio.pause();
+  } else if (currentPhase === 5 || currentPhase === 6) {
     finalAudio.pause();
-    choiceAudio.pause();
   } else if (currentPhase === 7) {
-    startAudio.pause();
     choiceAudio.pause();
   }
 }
@@ -103,23 +100,40 @@ function transitionToPhase(number) {
   const reachablePhase = gameComplete ? requestedPhase : Math.min(requestedPhase, 3);
   if (isTransitioning || reachablePhase === currentPhase) return;
 
-  if (reachablePhase === 2 && currentPhase === 1 && startAudio.paused) {
-    playTrack(startAudio, startAudioStatus);
-  } else if ((reachablePhase === 2 || reachablePhase === 3) && currentPhase >= 4 && startAudio.paused) {
-    playTrack(startAudio, startAudioStatus);
+  if (reachablePhase <= 4) {
+    choiceAudio.pause();
+    finalAudio.pause();
+    if (startAudio.paused) playTrack(startAudio, startAudioStatus);
+  }
+  if (reachablePhase === 5 && currentPhase !== 5) {
+    startAudio.pause();
+    finalAudio.pause();
+    if (choiceAudio.paused) playTrack(choiceAudio, choiceAudioStatus);
+  } else if (reachablePhase === 6 && currentPhase === 7) {
+    finalAudio.pause();
+    if (choiceAudio.paused) playTrack(choiceAudio, choiceAudioStatus);
   }
   if (reachablePhase === 7 && currentPhase !== 7) {
+    startAudio.pause();
+    choiceAudio.pause();
     finalAudio.currentTime = 0;
     playTrack(finalAudio, finalAudioStatus);
   }
 
   isTransitioning = true;
+  document.querySelector(".app-shell").setAttribute("aria-busy", "true");
+  phaseLoaderMessage.textContent = reachablePhase === 5
+    ? "Preparando la canción..."
+    : reachablePhase === 7
+      ? "Preparando el final..."
+      : "Un momentico...";
   phaseLoader.hidden = false;
   phaseLoader.setAttribute("aria-hidden", "false");
   window.setTimeout(() => {
     showPhase(reachablePhase);
     phaseLoader.hidden = true;
     phaseLoader.setAttribute("aria-hidden", "true");
+    document.querySelector(".app-shell").setAttribute("aria-busy", "false");
     isTransitioning = false;
   }, 460);
 }
@@ -130,7 +144,9 @@ function playTrack(audioElement, statusElement) {
     statusElement.classList.remove("audio-error");
   }).catch((error) => {
     if (error.name === "NotAllowedError") {
-      statusElement.textContent = "Toca reproducir para escucharla.";
+      statusElement.textContent = audioElement === startAudio
+        ? "Toca la pantalla para escucharla."
+        : "Toca reproducir para escucharla.";
     } else {
       statusElement.textContent = "Esta canción todavía no está lista.";
       statusElement.classList.add("audio-error");
@@ -327,12 +343,48 @@ function drawBackground() {
     context.fill();
   }
 
+  drawGardenDetails();
+
   context.fillStyle = "rgba(246, 194, 255, .48)";
   context.font = "700 12px DM Mono, monospace";
   context.fillText("LUNA.exe", 28, 36);
   context.fillText("SECTOR 01", canvas.width - 112, 36);
   context.fillStyle = "rgba(146, 234, 255, .54)";
   context.fillText("AR-AI / ONLINE", 28, canvas.height - 20);
+}
+
+function drawGardenDetails() {
+  const flowers = [
+    { x: 90, y: 112, color: "#f7a9dc" },
+    { x: 310, y: 448, color: "#9cecff" },
+    { x: 570, y: 78, color: "#f7d58a" },
+    { x: 735, y: 450, color: "#c5a5ff" },
+    { x: 910, y: 130, color: "#ffa9d7" }
+  ];
+
+  flowers.forEach((flower, index) => {
+    context.save();
+    context.translate(flower.x, flower.y);
+    context.globalAlpha = .72;
+    context.strokeStyle = "#8ee5cf";
+    context.lineWidth = 2;
+    context.beginPath();
+    context.moveTo(0, 10);
+    context.quadraticCurveTo(index % 2 ? -7 : 7, 0, 0, -8);
+    context.stroke();
+    context.fillStyle = flower.color;
+    for (let petal = 0; petal < 5; petal += 1) {
+      const angle = (petal * Math.PI * 2) / 5;
+      context.beginPath();
+      context.arc(Math.cos(angle) * 5, Math.sin(angle) * 5 - 9, 3, 0, Math.PI * 2);
+      context.fill();
+    }
+    context.fillStyle = "#fff2a3";
+    context.beginPath();
+    context.arc(0, -9, 2.5, 0, Math.PI * 2);
+    context.fill();
+    context.restore();
+  });
 }
 
 function drawStar(star, animationTime) {
@@ -548,6 +600,20 @@ function drawChalkLine(event) {
   chalkboardContext.stroke();
 }
 
+function canDrawFromTarget(target) {
+  return target instanceof Element
+    && !target.closest("button, a, audio, input, select, textarea, canvas, .joystick, .phase-loader");
+}
+
+function startChalkLine(x, y) {
+  isDrawing = true;
+  chalkboardContext.strokeStyle = chalkColors[chalkColorIndex % chalkColors.length];
+  chalkColorIndex += 1;
+  chalkboardContext.lineWidth = 4;
+  chalkboardContext.beginPath();
+  chalkboardContext.moveTo(x, y);
+}
+
 function updateJoystick(event) {
   const bounds = joystick.getBoundingClientRect();
   const centerX = bounds.left + bounds.width / 2;
@@ -706,14 +772,13 @@ document.getElementById("clear-doodles").addEventListener("click", () => {
   chalkboardContext.clearRect(0, 0, window.innerWidth, window.innerHeight);
 });
 window.addEventListener("pointerdown", (event) => {
-  if (event.button !== 0 || event.target.closest("button, a, audio, input, select, textarea, canvas, .joystick")) return;
-  isDrawing = true;
-  chalkboardContext.strokeStyle = chalkColors[chalkColorIndex % chalkColors.length];
-  chalkColorIndex += 1;
-  chalkboardContext.lineWidth = 4;
-  chalkboardContext.beginPath();
-  chalkboardContext.moveTo(event.clientX, event.clientY);
+  if (currentPhase === 1 && startAudio.paused) playTrack(startAudio, startAudioStatus);
+  if (event.pointerType === "touch" || event.button !== 0 || !canDrawFromTarget(event.target)) return;
+  startChalkLine(event.clientX, event.clientY);
 });
+window.addEventListener("keydown", () => {
+  if (currentPhase === 1 && startAudio.paused) playTrack(startAudio, startAudioStatus);
+}, { once: true });
 window.addEventListener("pointermove", (event) => {
   if (isDrawing) drawChalkLine(event);
 });
@@ -721,6 +786,21 @@ window.addEventListener("pointerup", () => {
   isDrawing = false;
 });
 window.addEventListener("pointercancel", () => {
+  isDrawing = false;
+});
+window.addEventListener("touchstart", (event) => {
+  if (event.touches.length !== 1 || !canDrawFromTarget(event.target)) return;
+  startChalkLine(event.touches[0].clientX, event.touches[0].clientY);
+}, { passive: true });
+window.addEventListener("touchmove", (event) => {
+  if (!isDrawing || event.touches.length !== 1) return;
+  event.preventDefault();
+  drawChalkLine(event.touches[0]);
+}, { passive: false });
+window.addEventListener("touchend", () => {
+  isDrawing = false;
+});
+window.addEventListener("touchcancel", () => {
   isDrawing = false;
 });
 window.addEventListener("resize", resizeChalkboard);
@@ -745,4 +825,5 @@ resizeChalkboard();
 updatePortalButton();
 showPhase(1);
 drawWorld();
+playTrack(startAudio, startAudioStatus);
 window.requestAnimationFrame(gameLoop);

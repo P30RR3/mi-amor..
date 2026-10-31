@@ -719,6 +719,7 @@ body::after { background: rgba(124, 92, 248, .25); }
 .launch-kicker { color: #a48aa9; font-family: "DM Mono", monospace; font-size: 10px; letter-spacing: .3em; }
 .launch-screen h1 { margin: 13px 0 0; color: #55345f; font-family: "Space Grotesk", sans-serif; font-size: clamp(35px, 5vw, 60px); font-weight: 600; letter-spacing: -.06em; line-height: 1; }
 .launch-name { margin: 10px 0 22px; color: #c05acb; font-family: "DM Mono", monospace; font-size: clamp(12px, 1.4vw, 16px); letter-spacing: .22em; }
+.launch-screen .start-audio-note { min-height: 0; margin: 0 0 6px; font-size: 9px; }
 .launch-button { min-width: 142px; min-height: 43px; }
 .app-shell:not(.is-start-screen) {
   width: min(1120px, calc(100vw - 64px));

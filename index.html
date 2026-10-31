@@ -53,6 +53,7 @@
           <span class="launch-kicker">PARA</span>
           <h1 id="welcome-title">María Ángel</h1>
           <p class="launch-name">/ Ara /</p>
+          <p class="audio-file-note start-audio-note" id="start-audio-status" role="status" aria-live="polite"></p>
           <button class="button button-primary launch-button" type="button" data-go="2">Empezar <span aria-hidden="true">→</span></button>
         </div>
       </section>
@@ -85,7 +86,6 @@
           <button class="button button-primary" type="button" data-start-game>Vamos pues <span aria-hidden="true">→</span></button>
         </div>
         <button class="button button-secondary skip-game-button" type="button" data-skip-game>Si me das un beso, lo puedes saltar</button>
-        <p class="audio-file-note start-audio-note" id="start-audio-status" role="status" aria-live="polite"></p>
         <div class="phase-caption"><span>02</span><span> / EL JUEGUITO</span></div>
       </section>
 
@@ -144,7 +144,7 @@
               <span class="track-label">PARA PONERLE AMBIENTE</span>
               <h2 id="music-title">Esta te la dejo a ti.</h2>
               <p>Dale play cuando te provoque.</p>
-              <audio class="local-audio-player" id="choice-audio" controls preload="none">
+              <audio class="local-audio-player" id="choice-audio" controls preload="none" loop>
                 <source src="assets/mp3/cancion-elegida.mp3" type="audio/mpeg">
                 Tu navegador no puede reproducir este audio.
               </audio>
@@ -176,9 +176,9 @@
           <div class="proposal-confetti" aria-hidden="true"><span>✳</span><span>✦</span><span>●</span><span>✳</span></div>
           <span class="eyebrow"><span class="eyebrow-star">✳</span> ÚLTIMA PANTALLA</span>
           <div class="proposal-sticker" aria-hidden="true">MODO<br>VALIENTE</div>
-          <h2 id="proposal-title">¿Quieres ser<br>mi jeva?</h2>
+          <h2 id="proposal-title">¿Quieres ser<br>mi novia?</h2>
           <p class="proposal-copy">Aunque haya kilómetros de por medio, me encanta compartir mis días contigo.<br><span>¿Seguimos sumando canciones, mensajes y risas?</span></p>
-          <audio class="local-audio-player final-audio-player" id="final-audio" controls preload="none">
+          <audio class="local-audio-player final-audio-player" id="final-audio" controls preload="none" loop>
             <source src="assets/mp3/cancion-final.mp3" type="audio/mpeg">
             Tu navegador no puede reproducir este audio.
           </audio>
@@ -235,9 +235,9 @@
     </main>
     <div class="phase-loader" id="phase-loader" role="status" aria-live="polite" aria-hidden="true" hidden>
       <span class="loader-orbit" aria-hidden="true"><i></i><i></i><i></i></span>
-      <span>Un momentico...</span>
+      <span id="phase-loader-message">Un momentico...</span>
     </div>
-    <audio id="start-audio" preload="none">
+    <audio id="start-audio" autoplay preload="auto" loop>
       <source src="assets/mp3/inicio-minijuego.mp3" type="audio/mpeg">
     </audio>
   </body>

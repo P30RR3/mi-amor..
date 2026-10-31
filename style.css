@@ -1314,8 +1314,10 @@ kbd, .keycap { border-color: #e5dced; background: #fbf8ff; color: #704d91; }
   letter-spacing: .08em;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  animation: loader-enter .35s ease both;
 }
 .phase-loader[hidden] { display: none; }
+@keyframes loader-enter { from { opacity: 0; } to { opacity: 1; } }
 .loader-orbit {
   position: relative;
   display: block;

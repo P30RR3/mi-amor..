@@ -27,6 +27,11 @@ const finalAudio = document.getElementById("final-audio");
 const finalAudioStatus = document.getElementById("final-audio-status");
 const chalkboardCanvas = document.getElementById("chalkboard-canvas");
 const chalkboardContext = chalkboardCanvas.getContext("2d");
+const musicTracks = [
+  { audio: startAudio, status: startAudioStatus },
+  { audio: choiceAudio, status: choiceAudioStatus },
+  { audio: finalAudio, status: finalAudioStatus }
+];
 
 const player = { x: 90, y: 260, radius: 16, speed: 235 };
 const portal = { x: 870, y: 260, radius: 42 };
@@ -51,10 +56,13 @@ let lastFrame = 0;
 let lastDraw = 0;
 let isDrawing = false;
 let chalkColorIndex = 0;
+let audioFadeFrame = 0;
+let audioFadeToken = 0;
 
 function showPhase(number) {
   const requestedPhase = Math.max(1, Math.min(phases.length, number));
   currentPhase = gameComplete ? requestedPhase : Math.min(requestedPhase, 3);
+  isDrawing = false;
   if (currentPhase !== 3) resetJoystick();
   document.querySelector(".app-shell").classList.toggle("is-start-screen", currentPhase === 1);
 
@@ -85,14 +93,6 @@ function showPhase(number) {
     canvas.focus({ preventScroll: true });
   }
 
-  if (currentPhase <= 4) {
-    choiceAudio.pause();
-    finalAudio.pause();
-  } else if (currentPhase === 5 || currentPhase === 6) {
-    finalAudio.pause();
-  } else if (currentPhase === 7) {
-    choiceAudio.pause();
-  }
 }
 
 function transitionToPhase(number) {
@@ -100,33 +100,25 @@ function transitionToPhase(number) {
   const reachablePhase = gameComplete ? requestedPhase : Math.min(requestedPhase, 3);
   if (isTransitioning || reachablePhase === currentPhase) return;
 
-  if (reachablePhase <= 4) {
-    choiceAudio.pause();
-    finalAudio.pause();
-    if (startAudio.paused) playTrack(startAudio, startAudioStatus);
-  }
-  if (reachablePhase === 5 && currentPhase !== 5) {
-    startAudio.pause();
-    finalAudio.pause();
-    if (choiceAudio.paused) playTrack(choiceAudio, choiceAudioStatus);
-  } else if (reachablePhase === 6 && currentPhase === 7) {
-    finalAudio.pause();
-    if (choiceAudio.paused) playTrack(choiceAudio, choiceAudioStatus);
-  }
-  if (reachablePhase === 7 && currentPhase !== 7) {
-    startAudio.pause();
-    choiceAudio.pause();
-    finalAudio.currentTime = 0;
-    playTrack(finalAudio, finalAudioStatus);
-  }
+  const nextTrack = reachablePhase <= 4
+    ? musicTracks[0]
+    : reachablePhase <= 6
+      ? musicTracks[1]
+      : musicTracks[2];
+  if (reachablePhase === 7 && currentPhase !== 7) finalAudio.currentTime = 0;
+  switchMusicTrack(nextTrack.audio, nextTrack.status);
 
   isTransitioning = true;
   document.querySelector(".app-shell").setAttribute("aria-busy", "true");
-  phaseLoaderMessage.textContent = reachablePhase === 5
-    ? "Preparando la canción..."
-    : reachablePhase === 7
-      ? "Preparando el final..."
-      : "Un momentico...";
+  const introMessages = {
+    2: "Alistando la aventura...",
+    3: "Abriendo el jardín de luceritos...",
+    4: "Buscando un recuerdo bonito...",
+    5: "Preparando una canción para ti...",
+    6: "Guardando este momento...",
+    7: "Llegando a la pregunta importante..."
+  };
+  phaseLoaderMessage.textContent = introMessages[reachablePhase] || "Un momentico...";
   phaseLoader.hidden = false;
   phaseLoader.setAttribute("aria-hidden", "false");
   window.setTimeout(() => {
@@ -135,7 +127,64 @@ function transitionToPhase(number) {
     phaseLoader.setAttribute("aria-hidden", "true");
     document.querySelector(".app-shell").setAttribute("aria-busy", "false");
     isTransitioning = false;
-  }, 460);
+  }, 1100);
+}
+
+function switchMusicTrack(nextAudio, statusElement) {
+  const outgoingTracks = musicTracks
+    .map((track) => track.audio)
+    .filter((audioElement) => audioElement !== nextAudio && !audioElement.paused);
+
+  if (!nextAudio.paused && outgoingTracks.length === 0) return;
+  if (audioFadeFrame) window.cancelAnimationFrame(audioFadeFrame);
+  const transitionToken = ++audioFadeToken;
+
+  if (nextAudio.paused) {
+    nextAudio.volume = 0;
+    nextAudio.play().then(() => {
+      statusElement.textContent = "Ya está sonando.";
+      statusElement.classList.remove("audio-error");
+      fadeMusicTracks(nextAudio, outgoingTracks, transitionToken);
+    }).catch((error) => {
+      nextAudio.volume = 1;
+      if (error.name === "NotAllowedError") {
+        statusElement.textContent = "Toca reproducir para escucharla.";
+      } else {
+        reportAudioError(statusElement);
+      }
+    });
+    return;
+  }
+
+  fadeMusicTracks(nextAudio, outgoingTracks, transitionToken);
+}
+
+function fadeMusicTracks(nextAudio, outgoingTracks, transitionToken) {
+  const startTime = performance.now();
+  const fadeDuration = 950;
+
+  function updateFade(timestamp) {
+    if (transitionToken !== audioFadeToken) return;
+    const progress = Math.min((timestamp - startTime) / fadeDuration, 1);
+    nextAudio.volume = progress;
+    outgoingTracks.forEach((audioElement) => {
+      audioElement.volume = 1 - progress;
+    });
+
+    if (progress < 1) {
+      audioFadeFrame = window.requestAnimationFrame(updateFade);
+      return;
+    }
+
+    outgoingTracks.forEach((audioElement) => {
+      audioElement.pause();
+      audioElement.volume = 1;
+    });
+    nextAudio.volume = 1;
+    audioFadeFrame = 0;
+  }
+
+  audioFadeFrame = window.requestAnimationFrame(updateFade);
 }
 
 function playTrack(audioElement, statusElement) {
@@ -187,9 +236,13 @@ function resetGameState() {
 
 function resetGame() {
   resetGameState();
+  audioFadeToken += 1;
+  if (audioFadeFrame) window.cancelAnimationFrame(audioFadeFrame);
+  audioFadeFrame = 0;
   [startAudio, choiceAudio, finalAudio].forEach((audioElement) => {
     audioElement.pause();
     audioElement.currentTime = 0;
+    audioElement.volume = 1;
   });
   [startAudioStatus, choiceAudioStatus, finalAudioStatus].forEach((statusElement) => {
     statusElement.textContent = "";
@@ -198,11 +251,13 @@ function resetGame() {
   resetProposalScreens();
   showPhase(1);
   drawWorld();
+  playTrack(startAudio, startAudioStatus);
 }
 
 function resetProposalScreens() {
   document.getElementById("proposal-question").hidden = false;
   document.getElementById("proposal-yes-intro").hidden = true;
+  document.getElementById("proposal-surprise").hidden = true;
   document.getElementById("compliment-screen").hidden = true;
   document.getElementById("proposal-no-result").hidden = true;
 }
@@ -601,7 +656,8 @@ function drawChalkLine(event) {
 }
 
 function canDrawFromTarget(target) {
-  return target instanceof Element
+  return (currentPhase === 1 || currentPhase === 2)
+    && target instanceof Element
     && !target.closest("button, a, audio, input, select, textarea, canvas, .joystick, .phase-loader");
 }
 
@@ -701,6 +757,10 @@ document.getElementById("yes-button").addEventListener("click", () => {
     window.setTimeout(() => piece.remove(), 2200);
   }
 });
+document.getElementById("show-surprise").addEventListener("click", () => {
+  document.getElementById("proposal-yes-intro").hidden = true;
+  document.getElementById("proposal-surprise").hidden = false;
+});
 document.getElementById("no-button").addEventListener("click", () => {
   document.getElementById("proposal-question").hidden = true;
   document.getElementById("proposal-no-result").hidden = false;
@@ -757,12 +817,13 @@ document.getElementById("show-compliments").addEventListener("click", () => {
 
   list.replaceChildren(fragment);
   document.getElementById("compliment-count").textContent = String(compliments.length);
-  document.getElementById("proposal-yes-intro").hidden = true;
+  document.getElementById("proposal-surprise").hidden = true;
   document.getElementById("compliment-screen").hidden = false;
 });
 document.querySelectorAll("[data-return-question]").forEach((button) => {
   button.addEventListener("click", () => {
     document.getElementById("proposal-yes-intro").hidden = true;
+    document.getElementById("proposal-surprise").hidden = true;
     document.getElementById("compliment-screen").hidden = true;
     document.getElementById("proposal-no-result").hidden = true;
     document.getElementById("proposal-question").hidden = false;

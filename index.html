@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#fce8fa">
+    <meta name="description" content="Un plan digital con música, luceritos y una pregunta importante.">
+    <title>María Ángel · nuestra vida</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bowlby+One+SC&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <div class="chalkboard-layer" aria-hidden="true">
+      <div class="chalk-words">
+        <span class="chalk-word chalk-word-one">ara ara</span>
+        <span class="chalk-word chalk-word-two">mariangel</span>
+        <span class="chalk-word chalk-word-three">ara ara</span>
+        <span class="chalk-word chalk-word-four">mariangel</span>
+        <span class="chalk-word chalk-word-five">ara ara</span>
+        <span class="chalk-word chalk-word-six">mariangel</span>
+      </div>
+    </div>
+    <canvas id="chalkboard-canvas" aria-label="Pizarrón digital para dibujar"></canvas>
+    <button class="chalk-eraser" id="clear-doodles" type="button" aria-label="Borrar lo dibujado en el pizarrón" title="Toca y arrastra con el dedo o el mouse para dibujar">Borrar lo dibujado</button>
+    <main class="app-shell is-start-screen">
+      <header class="topbar">
+        <a class="brand" href="#inicio" data-home aria-label="Volver al inicio">
+          <span class="brand-icon" aria-hidden="true">✳</span>
+          <span>mi aventura<span class="brand-period">.</span></span>
+        </a>
+        <div class="topbar-actions">
+          <span class="topbar-note"><span class="live-dot"></span> conexión en línea</span>
+          <div class="game-hud" aria-label="Estado de la aventura">
+            <span class="hud-level">NIVEL 01</span>
+            <span class="hud-gems"><span aria-hidden="true">✦</span> <span id="header-stars">0/5</span></span>
+          </div>
+          <button class="home-button" type="button" data-home>↶ <span>Volver al inicio</span></button>
+        </div>
+      </header>
+
+      <div class="progress-area">
+        <div class="progress-copy"><span>PLAN DIGITAL</span><span id="progress-label">01 / 05</span></div>
+        <div class="progress-track" role="progressbar" aria-label="Progreso de la aventura" aria-valuemin="1" aria-valuemax="5" aria-valuenow="1">
+          <span class="progress-fill" id="progress-fill"></span>
+        </div>
+      </div>
+
+      <section class="phase phase-welcome is-active" id="phase-1" aria-labelledby="welcome-title">
+        <div class="launch-screen">
+          <span class="launch-kicker">PARA</span>
+          <h1 id="welcome-title">María Ángel</h1>
+          <p class="launch-name">/ Ara /</p>
+          <button class="button button-primary launch-button" type="button" data-go="2">Empezar <span aria-hidden="true">→</span></button>
+        </div>
+      </section>
+
+      <section class="phase phase-instructions" id="phase-2" aria-labelledby="instructions-title" hidden>
+        <div class="section-heading">
+          <span class="eyebrow"><span class="eyebrow-star">✳</span> UN JUEGUITO</span>
+          <h2 id="instructions-title">¿Te animas a jugar?</h2>
+          <p>Está fácil, mira:</p>
+        </div>
+        <div class="instruction-cards">
+          <article class="instruction-card">
+            <span class="card-number">01</span><span class="instruction-emoji" aria-hidden="true">🕹️</span>
+            <h3>Muévete</h3><p>Con flechas o WASD, como te quede más cómodo.</p>
+            <div class="key-row"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></div>
+          </article>
+          <article class="instruction-card">
+            <span class="card-number">02</span><span class="instruction-emoji" aria-hidden="true">💫</span>
+            <h3>Atrapa luceritos</h3><p>Pasa cerquita de los cinco brillitos.</p>
+            <div class="key-row"><kbd>✦</kbd><span>se guardan solitos</span></div>
+          </article>
+          <article class="instruction-card">
+            <span class="card-number">03</span><span class="instruction-emoji" aria-hidden="true">🌀</span>
+            <h3>Abre el portal</h3><p>Con cinco luceros, te aparece la salida.</p>
+            <div class="diamond-mini-row" aria-label="Cinco luceros">✦ ✦ ✦ ✦ ✦</div>
+          </article>
+        </div>
+        <div class="instructions-bottom">
+          <span class="friendly-note"><span aria-hidden="true">✦</span> Sin afán, aquí no se pierde.</span>
+          <button class="button button-primary" type="button" data-start-game>Vamos pues <span aria-hidden="true">→</span></button>
+        </div>
+        <button class="button button-secondary skip-game-button" type="button" data-skip-game>Si me das un beso, lo puedes saltar</button>
+        <p class="audio-file-note start-audio-note" id="start-audio-status" role="status" aria-live="polite"></p>
+        <div class="phase-caption"><span>02</span><span> / EL JUEGUITO</span></div>
+      </section>
+
+      <section class="phase phase-game" id="phase-3" aria-labelledby="game-title" hidden>
+        <div class="game-heading">
+          <div><span class="eyebrow"><span class="eyebrow-star">✳</span> MUNDO LILA · MISIÓN 01</span><h2 id="game-title">Atrapa los luceritos</h2></div>
+          <div class="diamond-counter" aria-live="polite"><span class="diamond-icon" aria-hidden="true">✦</span><strong id="star-count">0</strong><span>/ 5</span></div>
+        </div>
+        <div class="game-frame">
+          <canvas id="game-canvas" width="960" height="520" tabindex="0" aria-label="Juego: mueve a la exploradora para recoger cinco luceritos y entrar al portal">
+            Tu navegador no puede mostrar el juego. Puedes saltarlo si quieres.
+          </canvas>
+          <div class="game-message" id="game-message" role="status" aria-live="polite">Mira esos luceritos, están por ahí.</div>
+          <span class="mine-label">JARDÍN DIGITAL · NIVEL 01</span>
+        </div>
+        <div class="game-tools">
+          <div class="keyboard-hint"><span class="keycap">W</span><span class="keycap">A</span><span class="keycap">S</span><span class="keycap">D</span><span>moverse</span><span class="hint-divider">·</span><span class="joystick-hint">arrastra el joystick</span><span>las ✦ se recogen al pasar</span></div>
+          <div class="mobile-controls" aria-label="Controles para móvil">
+            <div class="joystick" id="game-joystick" role="group" aria-label="Joystick: arrastra el control para mover a la exploradora">
+              <span class="joystick-ring" aria-hidden="true"></span>
+              <span class="joystick-thumb" id="joystick-thumb" aria-hidden="true">✦</span>
+            </div>
+            <button class="mobile-action" id="mobile-hint" type="button">✦ <span>Pista</span></button>
+          </div>
+          <div class="game-actions">
+            <button class="button button-secondary" id="hint-button" type="button">✦ Mostrarme un lucerito</button>
+            <button class="button button-treasure" id="portal-button" type="button" disabled>🌀 Ir al portal · 0/5</button>
+            <button class="button button-secondary skip-game-button" type="button" data-skip-game>Si me das un beso, lo puedes saltar</button>
+          </div>
+        </div>
+        <div class="game-bottom-note"><span>✦</span> Recoge cinco y acércate al portal, sin afán.</div>
+        <div class="phase-caption"><span>03</span><span> / LUCERITOS</span></div>
+      </section>
+
+      <section class="phase phase-music" id="phase-4" aria-labelledby="music-title" hidden>
+        <div class="music-card">
+          <div class="music-topline"><span class="eyebrow"><span class="eyebrow-star">✳</span> CANCIÓN 02 · A TU GUSTO</span><span class="audio-live"><i></i> LISTA</span></div>
+          <div class="music-layout">
+            <div class="music-cover" aria-hidden="true">
+              <span class="cover-ring cover-ring-one"></span><span class="cover-ring cover-ring-two"></span>
+              <span class="cover-disc"><i></i></span><span class="cover-spark">✦</span>
+              <span class="cover-caption">M.A. / 02</span>
+            </div>
+            <div class="music-copy">
+              <span class="track-label">PARA PONERLE AMBIENTE</span>
+              <h2 id="music-title">Esta te la dejo a ti.</h2>
+              <p>Dale play cuando te provoque.</p>
+              <audio class="local-audio-player" id="choice-audio" controls preload="none">
+                <source src="assets/mp3/cancion-elegida.mp3" type="audio/mpeg">
+                Tu navegador no puede reproducir este audio.
+              </audio>
+              <p class="audio-file-note" id="choice-audio-status"></p>
+            </div>
+          </div>
+          <div class="music-recommendations">
+            <span class="track-label">OTRAS QUE PEGAN CON EL PLAN</span>
+            <div class="music-tags"><span>Rauw Alejandro · Sexo Virtual</span><span>Beéle · Tu canción</span><span>Salsa venezolana · Oscar D'León</span></div>
+          </div>
+          <button class="button button-primary music-next" type="button" data-go="5">Seguir <span aria-hidden="true">→</span></button>
+        </div>
+        <div class="phase-caption"><span>04</span><span> / TU CANCIÓN</span></div>
+      </section>
+
+      <section class="phase phase-proposal" id="phase-5" aria-labelledby="proposal-title" hidden>
+        <div class="proposal-card">
+          <div class="proposal-confetti" aria-hidden="true"><span>✳</span><span>✦</span><span>●</span><span>✳</span></div>
+          <span class="eyebrow"><span class="eyebrow-star">✳</span> ÚLTIMA PANTALLA</span>
+          <div class="proposal-sticker" aria-hidden="true">MODO<br>VALIENTE</div>
+          <h2 id="proposal-title">¿Quieres ser<br>mi jeva?</h2>
+          <p class="proposal-copy">Aunque haya kilómetros de por medio, me encanta compartir mis días contigo.<br><span>¿Seguimos sumando canciones, mensajes y risas?</span></p>
+          <audio class="local-audio-player final-audio-player" id="final-audio" controls preload="none">
+            <source src="assets/mp3/cancion-final.mp3" type="audio/mpeg">
+            Tu navegador no puede reproducir este audio.
+          </audio>
+          <p class="audio-file-note final-audio-note" id="final-audio-status"></p>
+          <div class="proposal-actions">
+            <button class="button button-primary proposal-yes" id="yes-button" type="button">Sí</button>
+            <button class="button button-secondary proposal-no" id="no-button" type="button">No</button>
+          </div>
+          <p class="proposal-response" id="proposal-response" role="status" aria-live="polite"></p>
+          <button class="restart-button" type="button" data-home>↶ Volver a empezar</button>
+        </div>
+        <div class="phase-caption"><span>05</span><span> / PREGUNTA IMPORTANTE</span></div>
+      </section>
+
+      <nav class="phase-nav" aria-label="Navegar por las pantallas">
+        <button class="nav-arrow" id="previous-phase" type="button" aria-label="Fase anterior" disabled>←</button>
+        <div class="phase-dots">
+          <button class="phase-dot is-current" type="button" data-phase="1" aria-label="Ir a fase 1" aria-current="step"></button>
+          <button class="phase-dot" type="button" data-phase="2" aria-label="Ir a fase 2"></button>
+          <button class="phase-dot" type="button" data-phase="3" aria-label="Ir a fase 3"></button>
+          <button class="phase-dot" type="button" data-phase="4" aria-label="Ir a fase 4" disabled></button>
+          <button class="phase-dot" type="button" data-phase="5" aria-label="Ir a fase 5" disabled></button>
+        </div>
+        <button class="nav-arrow" id="next-phase" type="button" aria-label="Fase siguiente">→</button>
+      </nav>
+
+      <footer class="footer"><span>UN PLAN HECHO CON CARIÑO</span><span>✳</span><span id="footer-phase">FASE 01 / 05</span></footer>
+    </main>
+    <audio id="start-audio" preload="none">
+      <source src="assets/mp3/inicio-minijuego.mp3" type="audio/mpeg">
+    </audio>
+  </body>
+</html>

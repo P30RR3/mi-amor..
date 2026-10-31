@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#f6bd65"/>
+      <stop offset=".52" stop-color="#ff846a"/>
+      <stop offset="1" stop-color="#a8d7e8"/>
+    </linearGradient>
+    <linearGradient id="record" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#303a37"/>
+      <stop offset="1" stop-color="#101715"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="640" fill="url(#background)"/>
+  <circle cx="320" cy="320" r="205" fill="#f3dfb2" opacity=".34"/>
+  <path d="M75 132h490M75 148h490M75 492h490M75 508h490" stroke="#fff" stroke-opacity=".44" stroke-width="3"/>
+  <circle cx="320" cy="320" r="178" fill="url(#record)"/>
+  <circle cx="320" cy="320" r="147" fill="none" stroke="#8e9990" stroke-opacity=".35" stroke-width="2"/>
+  <circle cx="320" cy="320" r="119" fill="none" stroke="#8e9990" stroke-opacity=".3" stroke-width="2"/>
+  <circle cx="320" cy="320" r="90" fill="none" stroke="#8e9990" stroke-opacity=".25" stroke-width="2"/>
+  <circle cx="320" cy="320" r="59" fill="#f8d776"/>
+  <path d="M294 303c0-23 32-32 48-13l18 22-18 25c-16 20-48 10-48-13Z" fill="#ff795f"/>
+  <circle cx="320" cy="320" r="6" fill="#333a34"/>
+  <path d="m115 237 7 20 20 7-20 7-7 20-7-20-20-7 20-7Zm410 120 5 14 14 5-14 5-5 14-5-14-14-5 14-5Z" fill="#fff5dd"/>
+  <path d="m492 196 4 11 11 4-11 4-4 11-4-11-11-4 11-4Z" fill="#fff5dd"/>
+  <rect x="17" y="17" width="606" height="606" rx="18" fill="none" stroke="#fff" stroke-opacity=".64" stroke-width="3"/>
+  <text x="43" y="79" fill="#293530" font-family="Arial,sans-serif" font-size="21" font-weight="700" letter-spacing="3">SIDE A · EL PLAN</text>
+  <text x="43" y="597" fill="#293530" font-family="Arial,sans-serif" font-size="18" font-weight="700" letter-spacing="4">PLAY IT YOUR WAY</text>
+</svg>

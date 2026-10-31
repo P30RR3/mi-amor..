@@ -1,0 +1,8 @@
+Agrega tus tres archivos MP3 en esta carpeta con estos nombres:
+
+1. inicio-minijuego.mp3  - empieza al iniciar y sigue durante la mina.
+2. cancion-elegida.mp3   - se reproduce cuando María Ángel toca el botón de play.
+3. cancion-final.mp3     - intenta reproducirse al llegar a la pantalla final.
+
+Si el navegador bloquea la reproducción automática, se puede iniciar con el
+control de audio que aparece en esa pantalla.

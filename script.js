@@ -179,8 +179,16 @@ function resetGame() {
     statusElement.textContent = "";
     statusElement.classList.remove("audio-error");
   });
+  resetProposalScreens();
   showPhase(1);
   drawWorld();
+}
+
+function resetProposalScreens() {
+  document.getElementById("proposal-question").hidden = false;
+  document.getElementById("proposal-yes-intro").hidden = true;
+  document.getElementById("compliment-screen").hidden = true;
+  document.getElementById("proposal-no-result").hidden = true;
 }
 
 function startGame() {
@@ -613,8 +621,8 @@ choiceAudio.addEventListener("error", () => reportAudioError(choiceAudioStatus))
 finalAudio.addEventListener("error", () => reportAudioError(finalAudioStatus));
 
 document.getElementById("yes-button").addEventListener("click", () => {
-  document.getElementById("proposal-response").textContent = "Ay, qué felicidad. Entonces seguimos compartiendo canciones, mensajes y risas, aunque haya kilómetros.";
-  const proposalCard = document.querySelector(".proposal-card");
+  document.getElementById("proposal-question").hidden = true;
+  document.getElementById("proposal-yes-intro").hidden = false;
   for (let index = 0; index < 22; index += 1) {
     const piece = document.createElement("span");
     piece.className = "celebration-piece";
@@ -623,12 +631,76 @@ document.getElementById("yes-button").addEventListener("click", () => {
     piece.style.setProperty("--piece-x", `${Math.random() * 100}%`);
     piece.style.setProperty("--piece-delay", `${Math.random() * .6}s`);
     piece.style.setProperty("--piece-color", ["#ff77bf", "#53d8ed", "#b98aff", "#ffcb69"][index % 4]);
-    proposalCard.append(piece);
+    document.getElementById("proposal-yes-intro").append(piece);
     window.setTimeout(() => piece.remove(), 2200);
   }
 });
 document.getElementById("no-button").addEventListener("click", () => {
-  document.getElementById("proposal-response").textContent = "Tranqui, no hay afán. Gracias por llegar hasta aquí.";
+  document.getElementById("proposal-question").hidden = true;
+  document.getElementById("proposal-no-result").hidden = false;
+});
+document.getElementById("show-compliments").addEventListener("click", () => {
+  const phraseSeeds = [
+    "verte sonreír con esa alegría tan tuya",
+    "escucharte hablar de lo que te emociona",
+    "compartir contigo esas conversaciones que se alargan",
+    "notar el cariño que pones en los pequeños detalles",
+    "conocer cada día un poquito más de ti",
+    "ver la emoción con la que cuentas tus planes",
+    "leer tus mensajes y sentirte cerquita",
+    "reírme contigo hasta por las cosas más sencillas",
+    "admirar la fuerza que tienes",
+    "ver cómo sigues adelante incluso cuando cuesta",
+    "aprender de tu manera de mirar la vida",
+    "celebrar cada logro tuyo, grande o pequeño",
+    "encontrar calma en tus palabras",
+    "descubrir canciones nuevas para compartir",
+    "pensar en todas las cosas lindas que aún nos esperan",
+    "ver tu lado más espontáneo",
+    "confiar en lo bonito que estamos construyendo",
+    "sentir que la distancia no borra lo que nos une",
+    "tenerte presente en mis días",
+    "imaginar todas las risas que todavía nos faltan"
+  ];
+  const complimentTemplates = [
+    (phrase) => `Me encanta ${phrase}.`,
+    (phrase) => `Qué bonito es ${phrase}.`,
+    (phrase) => `Siempre me alegra ${phrase}.`,
+    (phrase) => `No me canso de ${phrase}.`,
+    (phrase) => `Una de mis cosas favoritas es ${phrase}.`,
+    (phrase) => `Me hace feliz ${phrase}.`,
+    (phrase) => `Admiro mucho ${phrase}.`,
+    (phrase) => `A la distancia, disfruto ${phrase}.`,
+    (phrase) => `Me parece muy especial ${phrase}.`,
+    (phrase) => `Siempre voy a valorar ${phrase}.`
+  ];
+  const list = document.getElementById("compliment-list");
+  const compliments = complimentTemplates.flatMap((template) => phraseSeeds.map(template));
+  const fragment = document.createDocumentFragment();
+
+  compliments.forEach((compliment, index) => {
+    const item = document.createElement("li");
+    const number = document.createElement("span");
+    const text = document.createElement("p");
+    number.className = "compliment-number";
+    number.textContent = String(index + 1).padStart(3, "0");
+    text.textContent = compliment;
+    item.append(number, text);
+    fragment.append(item);
+  });
+
+  list.replaceChildren(fragment);
+  document.getElementById("compliment-count").textContent = String(compliments.length);
+  document.getElementById("proposal-yes-intro").hidden = true;
+  document.getElementById("compliment-screen").hidden = false;
+});
+document.querySelectorAll("[data-return-question]").forEach((button) => {
+  button.addEventListener("click", () => {
+    document.getElementById("proposal-yes-intro").hidden = true;
+    document.getElementById("compliment-screen").hidden = true;
+    document.getElementById("proposal-no-result").hidden = true;
+    document.getElementById("proposal-question").hidden = false;
+  });
 });
 document.getElementById("clear-doodles").addEventListener("click", () => {
   chalkboardContext.clearRect(0, 0, window.innerWidth, window.innerHeight);

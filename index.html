@@ -172,7 +172,7 @@
       </section>
 
       <section class="phase phase-proposal" id="phase-7" aria-labelledby="proposal-title" hidden>
-        <div class="proposal-card">
+        <div class="proposal-card" id="proposal-question">
           <div class="proposal-confetti" aria-hidden="true"><span>✳</span><span>✦</span><span>●</span><span>✳</span></div>
           <span class="eyebrow"><span class="eyebrow-star">✳</span> ÚLTIMA PANTALLA</span>
           <div class="proposal-sticker" aria-hidden="true">MODO<br>VALIENTE</div>
@@ -187,8 +187,32 @@
             <button class="button button-primary proposal-yes" id="yes-button" type="button">Sí</button>
             <button class="button button-secondary proposal-no" id="no-button" type="button">No</button>
           </div>
-          <p class="proposal-response" id="proposal-response" role="status" aria-live="polite"></p>
           <button class="restart-button" type="button" data-home>↶ Volver a empezar</button>
+        </div>
+        <div class="proposal-result proposal-yes-intro" id="proposal-yes-intro" aria-labelledby="yes-intro-title" hidden>
+          <span class="eyebrow"><span class="eyebrow-star">✳</span> SABÍA QUE DIRÍAS QUE SÍ</span>
+          <div class="result-icon yes-result-icon" aria-hidden="true">✦</div>
+          <h2 id="yes-intro-title">Yo te escribiría 100 poemas</h2>
+          <p>Pero eso no es suficiente, por eso te escribí 200.</p>
+          <button class="button button-primary" id="show-compliments" type="button">Ver los 200 piropos <span aria-hidden="true">→</span></button>
+          <button class="restart-button" type="button" data-return-question>↶ Volver a la pregunta</button>
+        </div>
+        <div class="compliment-screen" id="compliment-screen" aria-labelledby="compliment-title" hidden>
+          <div class="compliment-header">
+            <span class="eyebrow"><span class="eyebrow-star">✳</span> MIS 200 PIROPOS</span>
+            <h2 id="compliment-title">Uno por cada razón para sonreír</h2>
+            <p>Lee todos con calma, los escribí pensando en ti.</p>
+            <span class="compliment-count"><strong id="compliment-count">200</strong> piropos</span>
+          </div>
+          <ol class="compliment-list" id="compliment-list"></ol>
+          <button class="button button-secondary" type="button" data-return-question>Volver a la pregunta</button>
+        </div>
+        <div class="proposal-result proposal-no-result" id="proposal-no-result" aria-labelledby="no-result-title" hidden>
+          <span class="eyebrow"><span class="eyebrow-star">✳</span> UN ABRAZO A LA DISTANCIA</span>
+          <div class="result-icon no-result-icon" aria-hidden="true">☁</div>
+          <h2 id="no-result-title">Ay, qué triste me puse</h2>
+          <p>Igual gracias por leer todo esto. Te quiero mucho y respeto lo que sientes, sin presión.</p>
+          <button class="button button-secondary" type="button" data-return-question>Volver a la pregunta</button>
         </div>
         <div class="phase-caption"><span>07</span><span> / PREGUNTA IMPORTANTE</span></div>
       </section>

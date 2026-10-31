@@ -42,8 +42,8 @@
       </header>
 
       <div class="progress-area">
-        <div class="progress-copy"><span>PLAN DIGITAL</span><span id="progress-label">01 / 05</span></div>
-        <div class="progress-track" role="progressbar" aria-label="Progreso de la aventura" aria-valuemin="1" aria-valuemax="5" aria-valuenow="1">
+        <div class="progress-copy"><span>PLAN DIGITAL</span><span id="progress-label">01 / 07</span></div>
+        <div class="progress-track" role="progressbar" aria-label="Progreso de la aventura" aria-valuemin="1" aria-valuemax="7" aria-valuenow="1">
           <span class="progress-fill" id="progress-fill"></span>
         </div>
       </div>
@@ -120,7 +120,18 @@
         <div class="phase-caption"><span>03</span><span> / LUCERITOS</span></div>
       </section>
 
-      <section class="phase phase-music" id="phase-4" aria-labelledby="music-title" hidden>
+      <section class="phase phase-dedication" id="phase-4" aria-labelledby="dedication-title" hidden>
+        <div class="dedication-card">
+          <span class="eyebrow"><span class="eyebrow-star">✳</span> UNA CANCIÓN PARA TI</span>
+          <div class="dedication-orbit" aria-hidden="true"><span>♫</span><i></i><i></i><i></i></div>
+          <h2 id="dedication-title">Esta canción la elegí con mucho amor</h2>
+          <p>Un día te fuiste y le conté a alguien lo que sentía por ti. Esta canción se parece mucho a lo que siento.</p>
+          <button class="button button-primary" type="button" data-go="5">Escucharla <span aria-hidden="true">→</span></button>
+        </div>
+        <div class="phase-caption"><span>04</span><span> / UN RECUERDO</span></div>
+      </section>
+
+      <section class="phase phase-music" id="phase-5" aria-labelledby="music-title" hidden>
         <div class="music-card">
           <div class="music-topline"><span class="eyebrow"><span class="eyebrow-star">✳</span> CANCIÓN 02 · A TU GUSTO</span><span class="audio-live"><i></i> LISTA</span></div>
           <div class="music-layout">
@@ -144,12 +155,23 @@
             <span class="track-label">OTRAS QUE PEGAN CON EL PLAN</span>
             <div class="music-tags"><span>Rauw Alejandro · Sexo Virtual</span><span>Beéle · Tu canción</span><span>Salsa venezolana · Oscar D'León</span></div>
           </div>
-          <button class="button button-primary music-next" type="button" data-go="5">Seguir <span aria-hidden="true">→</span></button>
+          <button class="button button-primary music-next" type="button" data-go="6">Seguir <span aria-hidden="true">→</span></button>
         </div>
-        <div class="phase-caption"><span>04</span><span> / TU CANCIÓN</span></div>
+        <div class="phase-caption"><span>05</span><span> / TU CANCIÓN</span></div>
       </section>
 
-      <section class="phase phase-proposal" id="phase-5" aria-labelledby="proposal-title" hidden>
+      <section class="phase phase-final-intro" id="phase-6" aria-labelledby="final-intro-title" hidden>
+        <div class="final-intro-card">
+          <span class="eyebrow"><span class="eyebrow-star">✳</span> ANTES DE TERMINAR</span>
+          <div class="final-message-icon" aria-hidden="true"><span>✉</span><i>✦</i></div>
+          <h2 id="final-intro-title">Bueno, finalmente</h2>
+          <p>Este es el tan esperado mensaje para ti.</p>
+          <button class="button button-primary" type="button" data-go="7">Leer mi mensaje <span aria-hidden="true">→</span></button>
+        </div>
+        <div class="phase-caption"><span>06</span><span> / UN MENSAJITO</span></div>
+      </section>
+
+      <section class="phase phase-proposal" id="phase-7" aria-labelledby="proposal-title" hidden>
         <div class="proposal-card">
           <div class="proposal-confetti" aria-hidden="true"><span>✳</span><span>✦</span><span>●</span><span>✳</span></div>
           <span class="eyebrow"><span class="eyebrow-star">✳</span> ÚLTIMA PANTALLA</span>
@@ -168,7 +190,7 @@
           <p class="proposal-response" id="proposal-response" role="status" aria-live="polite"></p>
           <button class="restart-button" type="button" data-home>↶ Volver a empezar</button>
         </div>
-        <div class="phase-caption"><span>05</span><span> / PREGUNTA IMPORTANTE</span></div>
+        <div class="phase-caption"><span>07</span><span> / PREGUNTA IMPORTANTE</span></div>
       </section>
 
       <nav class="phase-nav" aria-label="Navegar por las pantallas">
@@ -179,12 +201,18 @@
           <button class="phase-dot" type="button" data-phase="3" aria-label="Ir a fase 3"></button>
           <button class="phase-dot" type="button" data-phase="4" aria-label="Ir a fase 4" disabled></button>
           <button class="phase-dot" type="button" data-phase="5" aria-label="Ir a fase 5" disabled></button>
+          <button class="phase-dot" type="button" data-phase="6" aria-label="Ir a fase 6" disabled></button>
+          <button class="phase-dot" type="button" data-phase="7" aria-label="Ir a fase 7" disabled></button>
         </div>
         <button class="nav-arrow" id="next-phase" type="button" aria-label="Fase siguiente">→</button>
       </nav>
 
-      <footer class="footer"><span>UN PLAN HECHO CON CARIÑO</span><span>✳</span><span id="footer-phase">FASE 01 / 05</span></footer>
+      <footer class="footer"><span>UN PLAN HECHO CON CARIÑO</span><span>✳</span><span id="footer-phase">FASE 01 / 07</span></footer>
     </main>
+    <div class="phase-loader" id="phase-loader" role="status" aria-live="polite" aria-hidden="true" hidden>
+      <span class="loader-orbit" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span>Un momentico...</span>
+    </div>
     <audio id="start-audio" preload="none">
       <source src="assets/mp3/inicio-minijuego.mp3" type="audio/mpeg">
     </audio>

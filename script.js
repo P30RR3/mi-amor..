@@ -8,6 +8,7 @@ const progressLabel = document.getElementById("progress-label");
 const footerPhase = document.getElementById("footer-phase");
 const previousButton = document.getElementById("previous-phase");
 const nextButton = document.getElementById("next-phase");
+const phaseLoader = document.getElementById("phase-loader");
 const canvas = document.getElementById("game-canvas");
 const context = canvas.getContext("2d");
 const starCount = document.getElementById("star-count");
@@ -40,6 +41,7 @@ const sparkles = [];
 const chalkColors = ["#ff77bf", "#53d8ed", "#b98aff", "#ffcb69"];
 const joystickInput = { x: 0, y: 0, pointerId: null };
 let currentPhase = 1;
+let isTransitioning = false;
 let collectedStars = 0;
 let gameComplete = false;
 let messageTimer;
@@ -72,8 +74,9 @@ function showPhase(number) {
   const progress = (currentPhase / phases.length) * 100;
   progressFill.style.width = `${progress}%`;
   progressTrack.setAttribute("aria-valuenow", String(currentPhase));
-  progressLabel.textContent = `${String(currentPhase).padStart(2, "0")} / 05`;
-  footerPhase.textContent = `PANTALLA ${String(currentPhase).padStart(2, "0")} / 05`;
+  const phaseTotal = String(phases.length).padStart(2, "0");
+  progressLabel.textContent = `${String(currentPhase).padStart(2, "0")} / ${phaseTotal}`;
+  footerPhase.textContent = `PANTALLA ${String(currentPhase).padStart(2, "0")} / ${phaseTotal}`;
   previousButton.disabled = currentPhase === 1;
   nextButton.disabled = currentPhase === phases.length || (currentPhase === 3 && !gameComplete);
 
@@ -85,21 +88,40 @@ function showPhase(number) {
   if (currentPhase === 2 || currentPhase === 3) {
     choiceAudio.pause();
     finalAudio.pause();
-    if (startAudio.paused && (previousPhase === 1 || previousPhase === 2 || previousPhase === 3 || previousPhase >= 4)) {
-      playTrack(startAudio, startAudioStatus);
-    }
-  } else if (currentPhase === 4) {
+  } else if (currentPhase === 4 || currentPhase === 5 || currentPhase === 6) {
     startAudio.pause();
     finalAudio.pause();
-    choiceAudio.currentTime = 0;
-  } else if (currentPhase === 5) {
+    choiceAudio.pause();
+  } else if (currentPhase === 7) {
     startAudio.pause();
     choiceAudio.pause();
-    if (finalAudio.paused) {
-      finalAudio.currentTime = 0;
-      playTrack(finalAudio, finalAudioStatus);
-    }
   }
+}
+
+function transitionToPhase(number) {
+  const requestedPhase = Math.max(1, Math.min(phases.length, number));
+  const reachablePhase = gameComplete ? requestedPhase : Math.min(requestedPhase, 3);
+  if (isTransitioning || reachablePhase === currentPhase) return;
+
+  if (reachablePhase === 2 && currentPhase === 1 && startAudio.paused) {
+    playTrack(startAudio, startAudioStatus);
+  } else if ((reachablePhase === 2 || reachablePhase === 3) && currentPhase >= 4 && startAudio.paused) {
+    playTrack(startAudio, startAudioStatus);
+  }
+  if (reachablePhase === 7 && currentPhase !== 7) {
+    finalAudio.currentTime = 0;
+    playTrack(finalAudio, finalAudioStatus);
+  }
+
+  isTransitioning = true;
+  phaseLoader.hidden = false;
+  phaseLoader.setAttribute("aria-hidden", "false");
+  window.setTimeout(() => {
+    showPhase(reachablePhase);
+    phaseLoader.hidden = true;
+    phaseLoader.setAttribute("aria-hidden", "true");
+    isTransitioning = false;
+  }, 460);
 }
 
 function playTrack(audioElement, statusElement) {
@@ -130,7 +152,7 @@ function setMessage(message) {
   messageTimer = window.setTimeout(() => gameMessage.classList.remove("message-pop"), 280);
 }
 
-function resetGame() {
+function resetGameState() {
   player.x = 90;
   player.y = 260;
   stars.forEach((star) => { star.collected = false; });
@@ -140,35 +162,37 @@ function resetGame() {
   hintTarget = null;
   keys.clear();
   resetJoystick();
-  [startAudio, choiceAudio, finalAudio].forEach((audioElement) => {
-    audioElement.pause();
-    audioElement.currentTime = 0;
-  });
-  startAudioStatus.textContent = "";
-  startAudioStatus.classList.remove("audio-error");
-  choiceAudioStatus.textContent = "";
-  choiceAudioStatus.classList.remove("audio-error");
-  finalAudioStatus.textContent = "";
-  finalAudioStatus.classList.remove("audio-error");
   starCount.textContent = "0";
   headerStars.textContent = "0/5";
   portalButton.disabled = true;
   portalButton.textContent = "🌀 Ir al portal · 0/5";
   setMessage("Mira esos luceritos, están por ahí.");
+}
+
+function resetGame() {
+  resetGameState();
+  [startAudio, choiceAudio, finalAudio].forEach((audioElement) => {
+    audioElement.pause();
+    audioElement.currentTime = 0;
+  });
+  [startAudioStatus, choiceAudioStatus, finalAudioStatus].forEach((statusElement) => {
+    statusElement.textContent = "";
+    statusElement.classList.remove("audio-error");
+  });
   showPhase(1);
   drawWorld();
 }
 
 function startGame() {
-  resetGame();
-  showPhase(3);
+  resetGameState();
+  transitionToPhase(3);
 }
 
 function setSkip() {
   gameComplete = true;
   keys.clear();
   setMessage("Listo, pasamos al siguiente plan.");
-  showPhase(4);
+  transitionToPhase(4);
 }
 
 function collectNearbyStars() {
@@ -217,7 +241,7 @@ function enterPortal() {
   portalButton.disabled = true;
   portalButton.textContent = "✓ Portal abierto";
   setMessage("Portal abierto, vamos al siguiente plan.");
-  window.setTimeout(() => showPhase(4), 650);
+  window.setTimeout(() => transitionToPhase(4), 650);
 }
 
 function showHint() {
@@ -494,7 +518,7 @@ function handleKeyDown(event) {
   if (currentPhase === 3 && ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "w", "a", "s", "d"].includes(key)) keys.add(key);
   if (currentPhase === 3 && key === "h") showHint();
   if (currentPhase === 3 && (key === "e" || key === " ")) enterPortal();
-  if (key === "Escape" && currentPhase > 1) showPhase(currentPhase - 1);
+  if (key === "Escape" && currentPhase > 1) transitionToPhase(currentPhase - 1);
 }
 
 function handleKeyUp(event) {
@@ -548,7 +572,7 @@ function resetJoystick() {
 }
 
 document.querySelectorAll("[data-go]").forEach((button) => {
-  button.addEventListener("click", () => showPhase(Number(button.dataset.go)));
+  button.addEventListener("click", () => transitionToPhase(Number(button.dataset.go)));
 });
 document.querySelectorAll("[data-home]").forEach((button) => {
   button.addEventListener("click", (event) => {
@@ -560,7 +584,7 @@ document.querySelector("[data-start-game]").addEventListener("click", startGame)
 document.querySelectorAll("[data-skip-game]").forEach((button) => button.addEventListener("click", setSkip));
 document.querySelectorAll("[data-phase]").forEach((button) => {
   button.addEventListener("click", () => {
-    if (!button.disabled) showPhase(Number(button.dataset.phase));
+    if (!button.disabled) transitionToPhase(Number(button.dataset.phase));
   });
 });
 joystick.addEventListener("pointerdown", (event) => {
@@ -579,8 +603,8 @@ joystick.addEventListener("pointermove", (event) => {
     if (event.pointerId === joystickInput.pointerId) resetJoystick();
   });
 });
-previousButton.addEventListener("click", () => showPhase(currentPhase - 1));
-nextButton.addEventListener("click", () => showPhase(currentPhase + 1));
+previousButton.addEventListener("click", () => transitionToPhase(currentPhase - 1));
+nextButton.addEventListener("click", () => transitionToPhase(currentPhase + 1));
 hintButton.addEventListener("click", showHint);
 document.getElementById("mobile-hint").addEventListener("click", showHint);
 portalButton.addEventListener("click", enterPortal);
